@@ -27,10 +27,11 @@ router.post('/register', function(req, res, next) {
                     }
                     else{
                         if(result1.length > 0){
+                            console.log(result1);
                             res.end();
                         }
                         else{
-                            mongoDbObj.user.find({$or: [{UserId : userId.toString(), EmailId : emailId.toString()}]}, {_id:0,UserId:1, EmailId:1}).toArray(function(err2, result2){
+                            mongoDbObj.user.find({$or: [{UserId : userId.toString()}, {EmailId : emailId.toString()}]}, {_id:0,UserId:1, EmailId:1}).toArray(function(err2, result2){
                                 if(err2){
                                     throw err2;
                                 }

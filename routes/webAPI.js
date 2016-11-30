@@ -211,12 +211,10 @@ router.post('/addAttendance', function (req, res, next) {
                             var EntryException = [];
                             try{
                                 var tempResult = result[0];
-                                console.log(tempResult)
                                 tempResult.Attendances.forEach(function (dataEntry){
                                     var flag = false;
                                     var d1 = new Date(dataEntry.Date);
                                     var d2 = new Date();
-                                    //dataEntry.Date == day
                                     if(d1.getDate()==d2.getDate() && d1.getFullYear()==d2.getFullYear() && d1.getMonth()==d2.getMonth()){
                                         var StudentList = dataEntry.StudentData;
                                         StudentList.forEach(function (student) {
@@ -284,6 +282,100 @@ router.post('/addAttendance', function (req, res, next) {
 });
 
 //API For getting Student List As Per Date
+router.post('/getStudentList', function(req, res, next){
+    var courseId = req.body.CourseId;
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var semester = null;
+    if((1<=month)&&(month<=5)){
+        semester = "Spring";
+    }
+    else if((6<=month)&&(month<=8)){
+        semester = "Summer";
+    }
+    else if((9<=month)&&(month<=12)){
+        semester = "Winter";
+    }
+    var reqDate = req.body.Date;
+    reqDate = date;
+    getMongoClient.mongoDbObj(function (mongoDbObj) {
+        if (mongoDbObj == null) {
+            res.write("Please Try later");
+            res.end();
+        }
+        else {
+            try{
+                mongoDbObj.attendances.find({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]}, {_id:0,Attendances:1}).toArray(function (err, result) {
+                    if(err){
+                        throw err;
+                    }
+                    else{
+                        if(result.length > 0){
+                            try{
+                                var tempResult = result[0];
+                                console.log(tempResult);
+                                var resultList = [];
+                                tempResult.Attendances.forEach(function (dataEntry){
+                                    var flag = false;
+                                    var d1 = new Date(dataEntry.Date);
+                                    var d2 = new Date();
+                                    if(d1.getDate()==d2.getDate() && d1.getFullYear()==d2.getFullYear() && d1.getMonth()==d2.getMonth()){
+                                        var StudentList = dataEntry.StudentData;
+                                        StudentList.forEach(function (student) {
+                                            resultList.push(student.UserId);
+                                        });
+                                    }
+                                });
+                                res.setHeader('Content-Type', 'application/json');
+                                res.send({"StudentList" : resultList});
+                            }
+                            catch(breakEx){
+                                if(breakEx==BreakException){
+                                    mongoDbObj.attendances.findAndModify({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]},[],{$set: {Attendances: result[0].Attendances}},{}, function (err1, result1) {
+                                        if(err1){
+                                            throw err1;
+                                        }
+                                        else{
+                                            res.setHeader('Content-Type', 'application/json');
+                                            res.send({"status" : "204", "message" : "Success"});
+                                        }
+                                    });
+                                }
+                                else if(breakEx==EntryException){
+                                    res.write("Already Entered Data");
+                                    res.end();
+                                }
+                                else{
+                                    throw breakEx;
+                                }
+                            }
+                        }
+                        else{
+                            //Change Code to ADD first Entry
+                            console.log(day);
+                            day = new Date();
+                            var entryJSON = {"CourseId" : courseId.toString(), "Semester" : semester.toString(), "Year" : year.toString(), "Attendances" : [{"Date" : day, "StudentData" : [{"UserId" : userId, "EntryTime" : punchTime}]}]};
+                            mongoDbObj.attendances.insert( entryJSON,{w:1},function (err2) {
+                                if(err2){
+                                    throw err2;
+                                }
+                                else{
+                                    res.setHeader('Content-Type', 'application/json');
+                                    res.send({"Status" : "204", "Message" : "Success"});
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            catch(ex){
+                res.write(ex.toString());
+                res.end();
+            }
+        }
+    });
+});
 
 //API For getting Date list from Attendance
 router.post('/getDates', function (req, res, next) {
@@ -329,6 +421,96 @@ router.post('/getDates', function (req, res, next) {
                 });
             }
             catch (ex) {
+                res.write(ex.toString());
+                res.end();
+            }
+        }
+    });
+});
+
+//API For Professor Registration
+router.post('/register', function(req, res, next) {
+    var userId = req.body.UserId;
+    var password = req.body.Password;
+    var fName = req.body.FirstName;
+    var lName = req.body.LastName;
+    var emailId = req.body.EmailId;
+    getMongoClient.mongoDbObj(function(mongoDbObj){
+        if(mongoDbObj==null){
+            console.log("Please Try later");
+            res.write("Please Try later");
+            res.end();
+        }
+        else {
+            try{
+                mongoDbObj.user.find({$or: [{UserId : userId.toString()}, {EmailId : emailId.toString()}]}, {_id:0,UserId:1, EmailId:1}).toArray(function(err2, result2){
+                    if(err2){
+                        throw err2;
+                    }
+                    else{
+                        if(result2.length > 0){
+                            console.log(result2);
+                            console.log("Hey");
+                            res.end();
+                        }
+                        else{
+                            var tempJSON = { "UserId" : userId.toString(),
+                                "Password" : password.toString(),
+                                "Type" : "Professor",
+                                "FirstName" : fName.toString(),
+                                "LastName" : lName.toString(),
+                                "EmailId" : emailId.toString()
+                            };
+                            mongoDbObj.user.insert(tempJSON,{w:1},function (err) {
+                                if(err){
+                                    throw err;
+                                }
+                                else{
+                                    res.setHeader('Content-Type', 'application/json');
+                                    res.send({"Status" : "204", "Message" : "Success"});
+                                    res.end();
+                                }
+                            });
+                        }
+                    }
+                });
+            } catch(ex){
+                res.send(ex.toString());
+                res.end();
+            }
+        }
+    });
+});
+
+//API For Logging in Professor
+router.post('/login', function(req, res, next){
+    var userId = req.body.UserId;
+    var password = req.body.Password;
+    getMongoClient.mongoDbObj(function (mongoDbObj) {
+        if(mongoDbObj==null) {
+            res.write("Please try again");
+            res.end();
+        }
+        else{
+            try{
+                mongoDbObj.user.find({$and: [{UserId : userId.toString(), Password : password.toString(), Type : "Professor"}]}, {_id:0, UserId:1, Password:1, FirstName:1, LastName:1, EmailId:1, IMEI:1}).toArray(function(err, result){
+                    if(err){
+                        throw err;
+                    }
+                    else{
+                        if(result.length > 0){
+                            console.log(result);
+                            res.setHeader('Content-Type', 'application/json');
+                            res.send({"Message" : "Success", "UserId" : userId, "Password" : password, "FirstName" : result[0].FirstName, "LastName" : result[0].LastName, "EmailId" : result[0].EmailId});
+                        }
+                        else{
+                            res.write("No Professors Found");
+                            res.end();
+                        }
+                    }
+                });
+            }
+            catch(ex){
                 res.write(ex.toString());
                 res.end();
             }
