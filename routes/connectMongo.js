@@ -6,7 +6,7 @@
 var mongoClient=require('mongodb').MongoClient;
 var mongoDbObj = null;
 var connected = false;
-//bknarahari:1234@ds046939.mlab.com:46939
+//maverick1234:1234@ds161225.mlab.com:61225
 
 exports.mongoDbObj = function(callback){
     mongoClient.connect('mongodb://maverick1234:1234@ds161225.mlab.com:61225/cmpe273-db', function(err, db) {
@@ -22,7 +22,7 @@ exports.mongoDbObj = function(callback){
                 user: db.collection('User'),
                 imei: db.collection('IMEI'),
                 courses: db.collection('Courses'),
-                attendance: db.collection('Attendances')
+                attendances: db.collection('Attendances')
             };
             connected = true;
             callback(mongoDbObj);
