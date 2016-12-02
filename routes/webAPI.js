@@ -16,8 +16,8 @@ router.post('/addCourse', function (req, res, next) {
     var professorId = req.body.UserId;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -48,8 +48,8 @@ router.post('/addCourse', function (req, res, next) {
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -74,8 +74,8 @@ router.post('/addStudent',function (req, res, next) {
     var studentList = req.body.StudentList;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -113,8 +113,8 @@ router.post('/addStudent',function (req, res, next) {
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -138,8 +138,8 @@ router.post('/getSummary',function (req, res, next) {
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -167,8 +167,8 @@ router.post('/getSummary',function (req, res, next) {
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -178,11 +178,12 @@ router.post('/getSummary',function (req, res, next) {
 router.post('/addAttendance', function (req, res, next) {
     var userId = req.body.UserId;
     var courseId = req.body.CourseId;
+    var punchTime = req.body.EntryTime;
     var date = new Date();
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var semester = null;
-    var punchTime = date.getTime();
+    punchTime = date.getTime();
     var day1 = date.getDate();
     var day = month+"/"+day1+"/"+year;
     if((1<=month)&&(month<=5)){
@@ -196,8 +197,8 @@ router.post('/addAttendance', function (req, res, next) {
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -274,8 +275,8 @@ router.post('/addAttendance', function (req, res, next) {
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -298,11 +299,10 @@ router.post('/getStudentList', function(req, res, next){
         semester = "Winter";
     }
     var reqDate = req.body.Date;
-    reqDate = date;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if (mongoDbObj == null) {
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else {
             try{
@@ -370,8 +370,8 @@ router.post('/getStudentList', function(req, res, next){
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -395,8 +395,8 @@ router.post('/getDates', function (req, res, next) {
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if (mongoDbObj == null) {
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else {
             try {
@@ -421,8 +421,8 @@ router.post('/getDates', function (req, res, next) {
                 });
             }
             catch (ex) {
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -437,9 +437,8 @@ router.post('/register', function(req, res, next) {
     var emailId = req.body.EmailId;
     getMongoClient.mongoDbObj(function(mongoDbObj){
         if(mongoDbObj==null){
-            console.log("Please Try later");
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else {
             try{
@@ -488,8 +487,8 @@ router.post('/login', function(req, res, next){
     var password = req.body.Password;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
-            res.write("Please try again");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -511,8 +510,94 @@ router.post('/login', function(req, res, next){
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
+            }
+        }
+    });
+});
+
+//API For getting Student List by CourseID
+router.post('/getStudentListByCourse', function (req, res, next) {
+    var courseId = req.body.CourseId;
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var semester = null;
+    if((1<=month)&&(month<=5)){
+        semester = "Spring";
+    }
+    else if((6<=month)&&(month<=8)){
+        semester = "Summer";
+    }
+    else if((9<=month)&&(month<=12)){
+        semester = "Winter";
+    }
+    getMongoClient.mongoDbObj(function (mongoDbObj) {
+        if(mongoDbObj==null) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+        }
+        else{
+            try{
+                mongoDbObj.courses.find({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]}, {_id:0,CourseId:1,StudentList:1,ClassTime:1}).toArray(function(err1, result1){
+                    if(err1){
+                        throw err1;
+                    }
+                    else{
+                        if(result1.length > 0){
+                            var courseDetail = result1[0];
+                            res.setHeader('Content-Type', 'application/json');
+                            res.send({"Code" : "200", "StudentList" : courseDetail.StudentList});
+                        }
+                        else{
+                            res.setHeader('Content-Type', 'application/json');
+                            res.send({"Code" : "204", "StudentList" : []});
+                        }
+                    }
+                });
+            }
+            catch(ex){
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
+            }
+        }
+    });
+});
+
+//API For Getting CourseList by ProfID
+router.post('/getCourses', function (req,res,next) {
+    var professorId = req.body.UserId;
+    getMongoClient.mongoDbObj(function (mongoDbObj) {
+        if(mongoDbObj==null) {
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+        }
+        else{
+            try{
+                mongoDbObj.courses.find({$and: [{ProfessorId: professorId.toString()}]}, {_id:0,CourseId:1,Semester:1,Year:1}).toArray(function(err1, result1){
+                    if(err1){
+                        throw err1;
+                    }
+                    else{
+                        if(result1.length > 0){
+                            var resultJSON = [];
+                            result1.forEach(function (result) {
+                                resultJSON.push({"Semester" : result.Semester, "Year" : result.Year, "CourseId" : result.CourseId});
+                            });
+                            res.setHeader('Content-Type', 'application/json');
+                            res.send({"Code" : "200", "CourseList" : resultJSON});
+                        }
+                        else{
+                            res.setHeader('Content-Type', 'application/json');
+                            res.send({"Code" : "204", "CourseList" : []});
+                        }
+                    }
+                });
+            }
+            catch(ex){
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });

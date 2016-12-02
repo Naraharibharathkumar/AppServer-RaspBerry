@@ -123,8 +123,8 @@ router.post('/login', function(req, res, next){
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
     });
@@ -199,8 +199,8 @@ router.post('/getCourses', function (req, res, next) {
                 });
             }
             catch(ex){
-                res.write(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }
    });
