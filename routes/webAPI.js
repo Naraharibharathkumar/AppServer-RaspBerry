@@ -57,19 +57,8 @@ router.post('/addCourse', function (req, res, next) {
 
 // API For adding Student to a Course
 router.post('/addStudent',function (req, res, next) {
-    var semester = null;
-    var date = new Date();
-    var month = date.getMonth() + 1;
-    if((1<=month)&&(month<=5)){
-        semester = "Spring";
-    }
-    else if((6<=month)&&(month<=8)){
-        semester = "Summer";
-    }
-    else if((9<=month)&&(month<=12)){
-        semester = "Winter";
-    }
-    var year = date.getFullYear();
+    var semester = req.body.Semester;
+    var year = req.body.Year;
     var courseId = req.body.CourseId;
     var studentList = req.body.StudentList;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
@@ -134,7 +123,7 @@ router.post('/getSummary',function (req, res, next) {
         semester = "Summer";
     }
     else if((9<=month)&&(month<=12)){
-        semester = "Winter";
+        semester = "Fall";
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
@@ -193,7 +182,7 @@ router.post('/addAttendance', function (req, res, next) {
         semester = "Summer";
     }
     else if((9<=month)&&(month<=12)){
-        semester = "Winter";
+        semester = "Fall";
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
@@ -296,7 +285,7 @@ router.post('/getStudentList', function(req, res, next){
         semester = "Summer";
     }
     else if((9<=month)&&(month<=12)){
-        semester = "Winter";
+        semester = "Fall";
     }
     var reqDate = req.body.Date;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
@@ -391,7 +380,7 @@ router.post('/getDates', function (req, res, next) {
         semester = "Summer";
     }
     else if((9<=month)&&(month<=12)){
-        semester = "Winter";
+        semester = "Fall";
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if (mongoDbObj == null) {
@@ -531,7 +520,7 @@ router.post('/getStudentListByCourse', function (req, res, next) {
         semester = "Summer";
     }
     else if((9<=month)&&(month<=12)){
-        semester = "Winter";
+        semester = "Fall";
     }
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
@@ -571,6 +560,7 @@ router.post('/getCourses', function (req,res,next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
             res.setHeader('Content-Type', 'application/json');
+            res.status(450);
             res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
         }
         else{
@@ -597,6 +587,7 @@ router.post('/getCourses', function (req,res,next) {
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
+                res.status(450);
                 res.send({"Code" : "450", "Message" : ex.toString()});
             }
         }

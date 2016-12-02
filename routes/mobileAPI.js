@@ -153,7 +153,7 @@ router.post('/getCourses', function (req, res, next) {
        semester = "Summer";
    }
    else if((9<=month)&&(month<=12)){
-       semester = "Winter";
+       semester = "Fall";
    }
    getMongoClient.mongoDbObj(function(mongoDbObj){
         if(mongoDbObj==null) {
