@@ -509,19 +509,8 @@ router.post('/login', function(req, res, next){
 //API For getting Student List by CourseID
 router.post('/getStudentListByCourse', function (req, res, next) {
     var courseId = req.body.CourseId;
-    var date = new Date();
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var semester = null;
-    if((1<=month)&&(month<=5)){
-        semester = "Spring";
-    }
-    else if((6<=month)&&(month<=8)){
-        semester = "Summer";
-    }
-    else if((9<=month)&&(month<=12)){
-        semester = "Fall";
-    }
+    var year = req.body.Year;
+    var semester = req.body.Semester;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
             res.setHeader('Content-Type', 'application/json');
