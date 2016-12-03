@@ -17,7 +17,8 @@ router.post('/addCourse', function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -27,8 +28,9 @@ router.post('/addCourse', function (req, res, next) {
                     }
                     else{
                         if(result1.length > 0){
-                            res.write("Please enter valid Course Section and Semester and Year");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "Please enter valid Course Section and Semester and Year"});
                         }
                         else{
                             var tempJSON = { "Semester" : semester.toString(), "Year" : year.toString(),
@@ -40,7 +42,8 @@ router.post('/addCourse', function (req, res, next) {
                                 }
                                 else{
                                     res.setHeader('Content-Type', 'application/json');
-                                    res.send({"Status" : "204", "Message" : "Success"});
+                                    res.status(200);
+                                    res.send({"Message" : "Success"});
                                 }
                             });
                         }
@@ -49,7 +52,8 @@ router.post('/addCourse', function (req, res, next) {
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -64,7 +68,8 @@ router.post('/addStudent',function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -90,24 +95,86 @@ router.post('/addStudent',function (req, res, next) {
                                 }
                                 else{
                                     res.setHeader('Content-Type', 'application/json');
-                                    res.send({"status" : "204", "message" : "Success"});
+                                    res.status(200);
+                                    res.send({"Message" : "Success"});
                                 }
                             });
                         }
                         else{
-                            res.write("No Course Found");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "No Course Found"});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
 });
+
+// API For Removing Student From a Course
+router.post('/removeStudent',function (req, res, next) {
+    var semester = req.body.Semester;
+    var year = req.body.Year;
+    var courseId = req.body.CourseId;
+    var studentList = req.body.StudentList;
+    getMongoClient.mongoDbObj(function (mongoDbObj) {
+        if(mongoDbObj==null){
+            res.setHeader('Content-Type', 'application/json');
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
+        }
+        else{
+            try{
+                mongoDbObj.courses.find({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]}, {_id:0,CourseId:1,StudentList:1,ClassTime:1}).toArray(function(err1, result1){
+                    if(err1){
+                        throw err1;
+                    }
+                    else{
+                        if(result1.length > 0){
+                            var courseDetail = result1[0];
+                            var tempList = courseDetail.StudentList;
+                            studentList.forEach(function (student) {
+                                if(tempList.indexOf(student) > -1){
+                                    tempList.splice(tempList.indexOf(student), 1);
+                                }
+                                else{
+
+                                }
+                            });
+                            mongoDbObj.courses.findAndModify({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]},[],{$set: {StudentList: tempList}},{}, function (err, result) {
+                                if(err){
+                                    throw err;
+                                }
+                                else{
+                                    res.setHeader('Content-Type', 'application/json');
+                                    res.status(200);
+                                    res.send({"Message" : "Success"});
+                                }
+                            });
+                        }
+                        else{
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "No Course Found"});
+                        }
+                    }
+                });
+            }
+            catch(ex){
+                res.setHeader('Content-Type', 'application/json');
+                res.status(450);
+                res.send({"Message" : ex.toString()});
+            }
+        }
+    });
+});
+
 
 //API For Dashboard
 router.post('/getSummary',function (req, res, next) {
@@ -128,7 +195,8 @@ router.post('/getSummary',function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -146,18 +214,21 @@ router.post('/getSummary',function (req, res, next) {
                             });
                             var monthList = ["January", "February", "March", "April", "May","June","July","August","September","October","November","December"];
                             res.setHeader('Content-Type', 'application/json');
+                            res.status(200);
                             res.send({"Months" : monthList , "AttendanceCount" : studentCount});
                         }
                         else{
-                            res.write("No Attendance Found");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "No Attendance Found"});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -187,7 +258,8 @@ router.post('/addAttendance', function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null){
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -204,7 +276,7 @@ router.post('/addAttendance', function (req, res, next) {
                                 tempResult.Attendances.forEach(function (dataEntry){
                                     var flag = false;
                                     var d1 = new Date(dataEntry.Date);
-                                    var d2 = new Date();
+                                    var d2 = date;
                                     if(d1.getDate()==d2.getDate() && d1.getFullYear()==d2.getFullYear() && d1.getMonth()==d2.getMonth()){
                                         var StudentList = dataEntry.StudentData;
                                         StudentList.forEach(function (student) {
@@ -232,13 +304,15 @@ router.post('/addAttendance', function (req, res, next) {
                                         }
                                         else{
                                             res.setHeader('Content-Type', 'application/json');
-                                            res.send({"status" : "204", "message" : "Success"});
+                                            res.status(200);
+                                            res.send({"Message" : "Success"});
                                         }
                                     });
                                 }
                                 else if(breakEx==EntryException){
-                                    res.write("Already Entered Data");
-                                    res.end();
+                                    res.setHeader('Content-Type', 'application/json');
+                                    res.status(450);
+                                    res.send({"Message" : "Attendance already Added"});
                                 }
                                 else{
                                     throw breakEx;
@@ -256,7 +330,8 @@ router.post('/addAttendance', function (req, res, next) {
                                 }
                                 else{
                                     res.setHeader('Content-Type', 'application/json');
-                                    res.send({"Status" : "204", "Message" : "Success"});
+                                    res.status(200);
+                                    res.send({"Message" : "Success"});
                                 }
                             });
                         }
@@ -265,7 +340,8 @@ router.post('/addAttendance', function (req, res, next) {
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -291,7 +367,8 @@ router.post('/getStudentList', function(req, res, next){
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if (mongoDbObj == null) {
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else {
             try{
@@ -300,67 +377,42 @@ router.post('/getStudentList', function(req, res, next){
                         throw err;
                     }
                     else{
+                        var studentList = [];
+                        var timeList = [];
                         if(result.length > 0){
                             try{
                                 var tempResult = result[0];
-                                console.log(tempResult);
-                                var resultList = [];
                                 tempResult.Attendances.forEach(function (dataEntry){
-                                    var flag = false;
                                     var d1 = new Date(dataEntry.Date);
-                                    var d2 = new Date();
+                                    var d2 = new Date(reqDate);
                                     if(d1.getDate()==d2.getDate() && d1.getFullYear()==d2.getFullYear() && d1.getMonth()==d2.getMonth()){
                                         var StudentList = dataEntry.StudentData;
                                         StudentList.forEach(function (student) {
-                                            resultList.push(student.UserId);
+                                            studentList.push(student.UserId);
+                                            timeList.push(student.EntryTime);
                                         });
                                     }
                                 });
                                 res.setHeader('Content-Type', 'application/json');
-                                res.send({"StudentList" : resultList});
+                                res.status(200);
+                                res.send({"StudentList" : studentList,"TimeList" : timeList});
                             }
                             catch(breakEx){
-                                if(breakEx==BreakException){
-                                    mongoDbObj.attendances.findAndModify({$and: [{Semester : semester.toString(), Year : year.toString(), CourseId: courseId.toString()}]},[],{$set: {Attendances: result[0].Attendances}},{}, function (err1, result1) {
-                                        if(err1){
-                                            throw err1;
-                                        }
-                                        else{
-                                            res.setHeader('Content-Type', 'application/json');
-                                            res.send({"status" : "204", "message" : "Success"});
-                                        }
-                                    });
-                                }
-                                else if(breakEx==EntryException){
-                                    res.write("Already Entered Data");
-                                    res.end();
-                                }
-                                else{
-                                    throw breakEx;
-                                }
+                                throw breakEx;
                             }
                         }
                         else{
-                            //Change Code to ADD first Entry
-                            console.log(day);
-                            day = new Date();
-                            var entryJSON = {"CourseId" : courseId.toString(), "Semester" : semester.toString(), "Year" : year.toString(), "Attendances" : [{"Date" : day, "StudentData" : [{"UserId" : userId, "EntryTime" : punchTime}]}]};
-                            mongoDbObj.attendances.insert( entryJSON,{w:1},function (err2) {
-                                if(err2){
-                                    throw err2;
-                                }
-                                else{
-                                    res.setHeader('Content-Type', 'application/json');
-                                    res.send({"Status" : "204", "Message" : "Success"});
-                                }
-                            });
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(204);
+                            res.send({"StudentList" : [],"TimeList" : []});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -385,7 +437,8 @@ router.post('/getDates', function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if (mongoDbObj == null) {
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else {
             try {
@@ -400,18 +453,21 @@ router.post('/getDates', function (req, res, next) {
                                 dateList.push(dataEntry.Date);
                             });
                             res.setHeader('Content-Type', 'application/json');
+                            res.status(200);
                             res.send({"DateList" : dateList});
                         }
                         else{
-                            res.write("No Dates Found");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "No Dates Found"});
                         }
                     }
                 });
             }
             catch (ex) {
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -427,7 +483,8 @@ router.post('/register', function(req, res, next) {
     getMongoClient.mongoDbObj(function(mongoDbObj){
         if(mongoDbObj==null){
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else {
             try{
@@ -437,9 +494,9 @@ router.post('/register', function(req, res, next) {
                     }
                     else{
                         if(result2.length > 0){
-                            console.log(result2);
-                            console.log("Hey");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "UserID or Email Already Registered"});
                         }
                         else{
                             var tempJSON = { "UserId" : userId.toString(),
@@ -455,16 +512,17 @@ router.post('/register', function(req, res, next) {
                                 }
                                 else{
                                     res.setHeader('Content-Type', 'application/json');
-                                    res.send({"Status" : "204", "Message" : "Success"});
-                                    res.end();
+                                    res.status(200);
+                                    res.send({"Message" : "Success"});
                                 }
                             });
                         }
                     }
                 });
             } catch(ex){
-                res.send(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -477,7 +535,8 @@ router.post('/login', function(req, res, next){
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -489,18 +548,21 @@ router.post('/login', function(req, res, next){
                         if(result.length > 0){
                             console.log(result);
                             res.setHeader('Content-Type', 'application/json');
-                            res.send({"Message" : "Success", "UserId" : userId, "Password" : password, "FirstName" : result[0].FirstName, "LastName" : result[0].LastName, "EmailId" : result[0].EmailId});
+                            res.status(200);
+                            res.send({"UserId" : userId, "Password" : password, "FirstName" : result[0].FirstName, "LastName" : result[0].LastName, "EmailId" : result[0].EmailId});
                         }
                         else{
-                            res.write("No Professors Found");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(450);
+                            res.send({"Message" : "No Professors Found"});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -514,7 +576,8 @@ router.post('/getStudentListByCourse', function (req, res, next) {
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
             res.setHeader('Content-Type', 'application/json');
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -526,18 +589,21 @@ router.post('/getStudentListByCourse', function (req, res, next) {
                         if(result1.length > 0){
                             var courseDetail = result1[0];
                             res.setHeader('Content-Type', 'application/json');
-                            res.send({"Code" : "200", "StudentList" : courseDetail.StudentList});
+                            res.status(200);
+                            res.send({"StudentList" : courseDetail.StudentList});
                         }
                         else{
                             res.setHeader('Content-Type', 'application/json');
-                            res.send({"Code" : "204", "StudentList" : []});
+                            res.status(204);
+                            res.send({"StudentList" : []});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -550,7 +616,7 @@ router.post('/getCourses', function (req,res,next) {
         if(mongoDbObj==null) {
             res.setHeader('Content-Type', 'application/json');
             res.status(450);
-            res.send({"Code" : "450", "Message" : "DataBase Connection Failed"});
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -565,11 +631,13 @@ router.post('/getCourses', function (req,res,next) {
                                 resultJSON.push({"Semester" : result.Semester, "Year" : result.Year, "CourseId" : result.CourseId});
                             });
                             res.setHeader('Content-Type', 'application/json');
-                            res.send({"Code" : "200", "CourseList" : resultJSON});
+                            res.status(200);
+                            res.send({"CourseList" : resultJSON});
                         }
                         else{
                             res.setHeader('Content-Type', 'application/json');
-                            res.send({"Code" : "204", "CourseList" : []});
+                            res.status(204);
+                            res.send({"CourseList" : []});
                         }
                     }
                 });
@@ -577,7 +645,7 @@ router.post('/getCourses', function (req,res,next) {
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
                 res.status(450);
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.send({"Message" : ex.toString()});
             }
         }
     });
