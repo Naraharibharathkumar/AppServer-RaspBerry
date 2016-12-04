@@ -383,8 +383,12 @@ router.post('/getStudentList', function(req, res, next){
                             try{
                                 var tempResult = result[0];
                                 tempResult.Attendances.forEach(function (dataEntry){
+                                    console.log(dataEntry.Date);
                                     var d1 = new Date(dataEntry.Date);
+                                    console.log(d1)
+                                    console.log(reqDate)
                                     var d2 = new Date(reqDate);
+                                    console.log(d2)
                                     if(d1.getDate()==d2.getDate() && d1.getFullYear()==d2.getFullYear() && d1.getMonth()==d2.getMonth()){
                                         var StudentList = dataEntry.StudentData;
                                         StudentList.forEach(function (student) {

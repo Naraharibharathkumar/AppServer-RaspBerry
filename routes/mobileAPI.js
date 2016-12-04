@@ -15,9 +15,9 @@ router.post('/register', function(req, res, next) {
     var emailId = req.body.EmailId;
     getMongoClient.mongoDbObj(function(mongoDbObj){
         if(mongoDbObj==null){
-            console.log("Please Try later");
-            res.write("Please Try later");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else {
             try{
@@ -60,8 +60,8 @@ router.post('/register', function(req, res, next) {
                                                     }
                                                     else{
                                                         res.setHeader('Content-Type', 'application/json');
-                                                        res.send({"Status" : "204", "Message" : "Success"});
-                                                        res.end();
+                                                        res.status(200);
+                                                        res.send({"Message" : "Success"});
                                                     }
                                                 });
                                             }
@@ -73,8 +73,9 @@ router.post('/register', function(req, res, next) {
                     }
                 });
             } catch(ex){
-                res.send(ex.toString());
-                res.end();
+                res.setHeader('Content-Type', 'application/json');
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -87,8 +88,9 @@ router.post('/login', function(req, res, next){
     var imei = req.body.IMEI;
     getMongoClient.mongoDbObj(function (mongoDbObj) {
         if(mongoDbObj==null) {
-            res.write("Please try again");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -108,23 +110,27 @@ router.post('/login', function(req, res, next){
                             if(flag){
                                 console.log(result);
                                 res.setHeader('Content-Type', 'application/json');
+                                res.status(200);
                                 res.send({"Message" : "Success", "UserId" : userId, "Password" : password, "FirstName" : result[0].FirstName, "LastName" : result[0].LastName, "EmailId" : result[0].EmailId, "IMEI" : imei });
                             }
                             else{
-                                res.write("No Students Found");
-                                res.end();
+                                res.setHeader('Content-Type', 'application/json');
+                                res.status(204);
+                                res.send({"Message" : "No Students Found"});
                             }
                         }
                         else{
-                            res.write("No Students Found");
-                            res.end();
+                            res.setHeader('Content-Type', 'application/json');
+                            res.status(204);
+                            res.send({"Message" : "No Students Found"});
                         }
                     }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
     });
@@ -157,8 +163,9 @@ router.post('/getCourses', function (req, res, next) {
    }
    getMongoClient.mongoDbObj(function(mongoDbObj){
         if(mongoDbObj==null) {
-            res.write("Please try again");
-            res.end();
+            res.setHeader('Content-Type', 'application/json');
+            res.status(450);
+            res.send({"Message" : "DataBase Connection Failed"});
         }
         else{
             try{
@@ -184,23 +191,27 @@ router.post('/getCourses', function (req, res, next) {
                            });
                            if(courseList.length > 0){
                                res.setHeader('Content-Type', 'application/json');
-                               res.send({"message" : "Success", "courseList" : courseList});
+                               res.status(200);
+                               res.send({"Message" : "Success", "CourseList" : courseList});
                            }
                            else{
-                               res.write("No Classes Today");
+                               res.setHeader('Content-Type', 'application/json');
+                               res.status(204);
+                               res.send({"Message" : "No Classes Today"});
                            }
-                           res.end();
                        }
                        else{
-                           res.write("No Courses Found for the student");
-                           res.end();
+                           res.setHeader('Content-Type', 'application/json');
+                           res.status(204);
+                           res.send({"Message" : "No Courses Found for the student"});
                        }
                    }
                 });
             }
             catch(ex){
                 res.setHeader('Content-Type', 'application/json');
-                res.send({"Code" : "450", "Message" : ex.toString()});
+                res.status(450);
+                res.send({"Message" : ex.toString()});
             }
         }
    });
