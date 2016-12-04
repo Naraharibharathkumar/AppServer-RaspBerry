@@ -239,11 +239,11 @@ router.post('/addAttendance', function (req, res, next) {
     var userId = req.body.UserId;
     var courseId = req.body.CourseId;
     var punchTime = req.body.EntryTime;
-    var date = new Date();
+    var date = new Date("2016-12-04");
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var semester = null;
-    punchTime = date.getTime();
+    punchTime = new Date().getTime();
     var day1 = date.getDate();
     var day = month+"/"+day1+"/"+year;
     if((1<=month)&&(month<=5)){
@@ -268,11 +268,13 @@ router.post('/addAttendance', function (req, res, next) {
                         throw err;
                     }
                     else{
+                        console.log(result)
                         if(result.length > 0){
                             var BreakException = {};
                             var EntryException = [];
                             try{
                                 var tempResult = result[0];
+                                console.log(tempResult);
                                 tempResult.Attendances.forEach(function (dataEntry){
                                     var flag = false;
                                     var d1 = new Date(dataEntry.Date);
@@ -294,6 +296,9 @@ router.post('/addAttendance', function (req, res, next) {
                                             throw BreakException;
                                         }
                                     }
+                                    else{
+                                        throw null;
+                                    }
                                 });
                             }
                             catch(breakEx){
@@ -314,6 +319,20 @@ router.post('/addAttendance', function (req, res, next) {
                                     res.status(450);
                                     res.send({"Message" : "Attendance already Added"});
                                 }
+                                else if(breakEx==null){
+                                    day = new Date();
+                                    var entryJSON = {"CourseId" : courseId.toString(), "Semester" : semester.toString(), "Year" : year.toString(), "Attendances" : [{"Date" : day, "StudentData" : [{"UserId" : userId, "EntryTime" : punchTime}]}]};
+                                    mongoDbObj.attendances.insert( entryJSON,{w:1},function (err2) {
+                                        if(err2){
+                                            throw err2;
+                                        }
+                                        else{
+                                            res.setHeader('Content-Type', 'application/json');
+                                            res.status(200);
+                                            res.send({"Message" : "Success"});
+                                        }
+                                    });
+                                }
                                 else{
                                     throw breakEx;
                                 }
@@ -321,7 +340,6 @@ router.post('/addAttendance', function (req, res, next) {
                         }
                         else{
                             //Change Code to ADD first Entry
-                            console.log(day);
                             day = new Date();
                             var entryJSON = {"CourseId" : courseId.toString(), "Semester" : semester.toString(), "Year" : year.toString(), "Attendances" : [{"Date" : day, "StudentData" : [{"UserId" : userId, "EntryTime" : punchTime}]}]};
                             mongoDbObj.attendances.insert( entryJSON,{w:1},function (err2) {
