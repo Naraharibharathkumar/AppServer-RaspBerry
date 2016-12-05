@@ -206,16 +206,25 @@ router.post('/getSummary',function (req, res, next) {
                     }
                     else{
                         if(result.length > 0){
-                            var studentCount = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            var studentCount = [];
+                            var dateCount = [];
                             result[0].Attendances.forEach(function (dataEntry) {
-                                var entryDate = new Date(dataEntry.Date);
-                                var index = date.getMonth();
-                                studentCount[index] = studentCount[index] + dataEntry.StudentData.length;
+                               dateCount.push(dataEntry.Date);
+                               studentCount.push(dataEntry.StudentData.length);
                             });
-                            var monthList = ["January", "February", "March", "April", "May","June","July","August","September","October","November","December"];
                             res.setHeader('Content-Type', 'application/json');
                             res.status(200);
-                            res.send({"Months" : monthList , "AttendanceCount" : studentCount});
+                            res.send({"Months" : dateCount , "AttendanceCount" : studentCount});
+                            // var studentCount = [0,0,0,0,0,0,0,0,0,0,0,0];
+                            // result[0].Attendances.forEach(function (dataEntry) {
+                            //     var entryDate = new Date(dataEntry.Date);
+                            //     var index = date.getMonth();
+                            //     studentCount[index] = studentCount[index] + dataEntry.StudentData.length;
+                            // });
+                            // var monthList = ["January", "February", "March", "April", "May","June","July","August","September","October","November","December"];
+                            // res.setHeader('Content-Type', 'application/json');
+                            // res.status(200);
+                            // res.send({"Months" : monthList , "AttendanceCount" : studentCount});
                         }
                         else{
                             res.setHeader('Content-Type', 'application/json');
