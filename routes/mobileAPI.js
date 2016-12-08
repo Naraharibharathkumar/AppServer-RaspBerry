@@ -178,6 +178,7 @@ router.post('/getCourses', function (req, res, next) {
                            // Write the logic for returning Course list
                            var courseList = [];
                            var index = 0;
+                           console.log(result)
                            result.forEach(function(tempResult){
                               var studentList = tempResult.StudentList;
                               var dayList = tempResult.Day;
@@ -191,13 +192,14 @@ router.post('/getCourses', function (req, res, next) {
                               }
                               index = index + 1;
                               if(index==result.length){
+                                  console.log(courseList);
                                   if(courseList.length > 0){
                                       res.setHeader('Content-Type', 'application/json');
                                       res.status(200);
                                       res.send({"Message" : "Success", "CourseList" : courseList});
                                   }
                                   else{
-                                      console.log("fsdhfidsb")
+                                      console.log("fsdhfidsb");
                                       res.setHeader('Content-Type', 'application/json');
                                       res.status(200);
                                       res.send({"Message" : "No Classes Today"});
