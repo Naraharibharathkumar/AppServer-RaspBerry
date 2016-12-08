@@ -177,6 +177,7 @@ router.post('/getCourses', function (req, res, next) {
                        if(result.length > 0){
                            // Write the logic for returning Course list
                            var courseList = [];
+                           console.log(result)
                            result.forEach(function(tempResult){
                               var studentList = tempResult.StudentList;
                               var dayList = tempResult.Day;
@@ -201,6 +202,7 @@ router.post('/getCourses', function (req, res, next) {
                            }
                        }
                        else{
+                           console.log("Heyy")
                            res.setHeader('Content-Type', 'application/json');
                            res.status(204);
                            res.send({"Message" : "No Courses Found for the student"});
