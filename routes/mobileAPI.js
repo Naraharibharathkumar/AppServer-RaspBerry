@@ -141,7 +141,8 @@ router.post('/login', function(req, res, next){
 router.post('/getCourses', function (req, res, next) {
    var userId = req.body.UserId;
    var date = new Date();
-   moment.tz(date, "America/Los_Angeles").format();
+   var m = moment.tz(date, "America/Los_Angeles").format('dddd');
+   console.log(m);
    var year = date.getFullYear();
    var month = date.getMonth() + 1;
    var weekday = new Array(7);
@@ -152,7 +153,7 @@ router.post('/getCourses', function (req, res, next) {
    weekday[4] = "Thursday";
    weekday[5] = "Friday";
    weekday[6] = "Saturday";
-   var day = weekday[date.getDay()];
+   var day = moment.tz(date, "America/Los_Angeles").format('dddd');
    var semester = null;
    if((1<=month)&&(month<=5)){
         semester = "Spring";
