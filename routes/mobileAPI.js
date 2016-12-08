@@ -196,8 +196,9 @@ router.post('/getCourses', function (req, res, next) {
                                res.send({"Message" : "Success", "CourseList" : courseList});
                            }
                            else{
+                               console.log("fsdhfidsb")
                                res.setHeader('Content-Type', 'application/json');
-                               res.status(204);
+                               res.status(200);
                                res.send({"Message" : "No Classes Today"});
                            }
                        }
