@@ -4,6 +4,7 @@
 var express = require('express');
 var getMongoClient = require('../routes/connectMongo');
 var router = express.Router();
+var moment = require('moment-timezone');
 
 // API For Registering Student
 router.post('/register', function(req, res, next) {
@@ -140,6 +141,7 @@ router.post('/login', function(req, res, next){
 router.post('/getCourses', function (req, res, next) {
    var userId = req.body.UserId;
    var date = new Date();
+   moment.tz(date, "America/Los_Angeles").format();
    var year = date.getFullYear();
    var month = date.getMonth() + 1;
    var weekday = new Array(7);
