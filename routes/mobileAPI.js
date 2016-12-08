@@ -184,6 +184,7 @@ router.post('/getCourses', function (req, res, next) {
                               var dayList = tempResult.Day;
                               var tempJSON = {};
                               console.log(studentList)
+                               console.log(userId)
                               if(studentList.indexOf(userId) > -1){
                                   if(dayList.indexOf(day) > -1) {
                                       tempJSON = {"Course" : tempResult.CourseId, "Semester" : tempResult.Semester,
