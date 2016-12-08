@@ -177,7 +177,7 @@ router.post('/getCourses', function (req, res, next) {
                        if(result.length > 0){
                            // Write the logic for returning Course list
                            var courseList = [];
-                           console.log(result)
+                           var index = 0;
                            result.forEach(function(tempResult){
                               var studentList = tempResult.StudentList;
                               var dayList = tempResult.Day;
@@ -189,18 +189,21 @@ router.post('/getCourses', function (req, res, next) {
                                       courseList.push(tempJSON);
                                   }
                               }
+                              index = index + 1;
+                              if(index==result.length){
+                                  if(courseList.length > 0){
+                                      res.setHeader('Content-Type', 'application/json');
+                                      res.status(200);
+                                      res.send({"Message" : "Success", "CourseList" : courseList});
+                                  }
+                                  else{
+                                      console.log("fsdhfidsb")
+                                      res.setHeader('Content-Type', 'application/json');
+                                      res.status(200);
+                                      res.send({"Message" : "No Classes Today"});
+                                  }
+                              }
                            });
-                           if(courseList.length > 0){
-                               res.setHeader('Content-Type', 'application/json');
-                               res.status(200);
-                               res.send({"Message" : "Success", "CourseList" : courseList});
-                           }
-                           else{
-                               console.log("fsdhfidsb")
-                               res.setHeader('Content-Type', 'application/json');
-                               res.status(200);
-                               res.send({"Message" : "No Classes Today"});
-                           }
                        }
                        else{
                            console.log("Heyy")
